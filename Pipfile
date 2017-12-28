@@ -9,6 +9,7 @@ name = "pypi"
 
 isort = "*"
 "flake8" = "*"
+ipython = "*"
 
 
 [packages]
