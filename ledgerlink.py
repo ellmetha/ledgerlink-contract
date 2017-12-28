@@ -10,8 +10,14 @@
 
 """
 
-from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger
+from boa.blockchain.vm.Neo.Action import RegisterAction
+from boa.blockchain.vm.Neo.Blockchain import GetHeight
+from boa.blockchain.vm.Neo.Output import GetScriptHash
+from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger, Notify
+from boa.blockchain.vm.Neo.Storage import Get, GetContext, Put
 from boa.blockchain.vm.Neo.TriggerType import Application, Verification
+from boa.blockchain.vm.System.ExecutionEngine import GetScriptContainer
+from boa.code.builtins import concat, substr
 
 
 # -------------------------------------------
@@ -19,7 +25,7 @@ from boa.blockchain.vm.Neo.TriggerType import Application, Verification
 # -------------------------------------------
 
 # Script hash of the contract owner.
-OWNER = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+OWNER = b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
 
 # The URL of the associated URL shortener service.
 SHORTENER_URL = 'https://ledgr.link'
@@ -27,6 +33,13 @@ SHORTENER_URL = 'https://ledgr.link'
 
 # -------------------------------------------
 # EVENTS
+# -------------------------------------------
+
+DispatchNewURLEvent = RegisterAction('urladd', 'code', 'url')
+
+
+# -------------------------------------------
+# CONTRACT METHODS
 # -------------------------------------------
 
 def Main(operation, args):
@@ -57,8 +70,76 @@ def Main(operation, args):
         if operation == 'shortenerURL':
             url = SHORTENER_URL
             return url
+        elif operation == 'addURL':
+            if len(args) == 1:
+                url = args[0]
+                r = add_url(url)
+                return r
+            else:
+                return False
+        elif operation == 'getURL':
+            if len(args) == 1:
+                code = args[0]
+                r = get_url(code)
+                return r
+            else:
+                return False
 
         result = 'unknown operation'
         return result
 
     return False
+
+
+def add_url(url):
+    """ Generates  new code and stores the <code, url> pair into the blockchain. """
+    # Retrieves the current "height" of the blockchain.
+    current_height = GetHeight()
+
+    # Retrieves the hash of the considered sender.
+    tx = GetScriptContainer()
+    references = tx.References
+    ref = references[0]
+    sender = GetScriptHash(ref)
+
+    # Generates a unique code.
+    s1 = b58encode(current_height, 11)
+    s2 = b58encode(sender, 2)
+    code = concat(s1, s2)
+    Notify(code)
+
+    # Puts it into the ledger.
+    context = GetContext()
+    Put(context, code, url)
+
+    # Fures an event indicating which <code, url> pair has been persisted into the ledger.
+    DispatchNewURLEvent(code, url)
+
+    return True
+
+
+def get_url(code):
+    """ Returns the URL associated with the considered code. """
+    context = GetContext()
+    url = Get(context, code)
+    return url
+
+
+# -------------------------------------------
+# UTILITIES
+# -------------------------------------------
+
+
+def b58encode(i, max_length):
+    """ Encodes an integer using Base58. """
+    alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    code = ''
+    current_length = 0
+    while i and (current_length < max_length):
+        newi = i // 58
+        idx = i % 58
+        i = newi
+        c = substr(alphabet, idx, 1)
+        code = concat(c, code)
+        current_length += 1
+    return code
