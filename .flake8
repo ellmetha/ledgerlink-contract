@@ -1,0 +1,4 @@
+[flake8]
+exclude = build,docs,.tox,.venv,venv,.git
+ignore = E731, F403
+max-line-length = 100
