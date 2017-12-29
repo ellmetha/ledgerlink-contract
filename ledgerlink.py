@@ -25,7 +25,7 @@ from boa.code.builtins import concat, substr
 # -------------------------------------------
 
 # Script hash of the contract owner.
-OWNER = b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
+OWNER = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 # The URL of the associated URL shortener service.
 SHORTENER_URL = 'https://ledgr.link'
