@@ -26,7 +26,7 @@ lint_python:
 # Import sort checks.
 isort: isort_python
 isort_python:
-	pipenv run isort --check-only --recursive --diff contracts
+	pipenv run isort --check-only --recursive --diff .
 
 
 # TESTING
