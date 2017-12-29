@@ -105,7 +105,9 @@ def add_url(url):
     # Generates a unique code.
     s1 = b58encode(current_height, 11)
     s2 = b58encode(sender, 2)
-    code = concat(s1, s2)
+    s3 = b58encode(url, 2)
+    code_part1 = concat(s1, s2)
+    code = concat(code_part1, s3)
     Notify(code)
 
     # Puts it into the ledger.
@@ -133,13 +135,20 @@ def get_url(code):
 def b58encode(i, max_length):
     """ Encodes an integer using Base58. """
     alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    code = ''
+    code = '\x00'
+
     current_length = 0
     while i and (current_length < max_length):
         newi = i // 58
         idx = i % 58
         i = newi
         c = substr(alphabet, idx, 1)
-        code = concat(c, code)
+
+        if code == '\x00':
+            code = c
+        else:
+            code = concat(c, code)
+
         current_length += 1
+
     return code
