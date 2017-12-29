@@ -112,7 +112,8 @@ def add_url(url):
 
     # Puts it into the ledger.
     context = GetContext()
-    Put(context, code, url)
+    contextkey_for_url = concat(code, '__url')
+    Put(context, contextkey_for_url, url)
 
     # Fures an event indicating which <code, url> pair has been persisted into the ledger.
     DispatchNewURLEvent(code, url)
@@ -123,7 +124,8 @@ def add_url(url):
 def get_url(code):
     """ Returns the URL associated with the considered code. """
     context = GetContext()
-    url = Get(context, code)
+    contextkey_for_url = concat(code, '__url')
+    url = Get(context, contextkey_for_url)
     return url
 
 
