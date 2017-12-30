@@ -9,6 +9,10 @@ interferences because they cannot be changed by anybody - they will live forever
 blockchain. Thus the NEO blockchain is used as a source of trust, ensuring that the shortened links
 always lead to where they are supposed to.
 
+This repository embeds the smart contract which provides a secure way of generating shortened-URLs
+and storing the related uniques codes into the NEO blockchain. This smart contract is written in
+Python and makes use of the neo-boa_ compiler.
+
 .. contents:: Table of Contents
     :local:
 
@@ -49,5 +53,6 @@ License
 MIT. See ``LICENSE`` for more details.
 
 
+.. _neo-boa: https://github.com/CityOfZion/neo-boa
 .. _Pipenv: https://github.com/kennethreitz/pipenv
 .. _Python: https://www.python.org
