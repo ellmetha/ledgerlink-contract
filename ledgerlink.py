@@ -48,10 +48,12 @@ def Main(operation, args):
     :param args: a list of arguments (which may be empty, but not absent)
     :type operation: str
     :type args: list
-    :return: a boolean indicating the successful execution of the smart contract
-    :rtype: bool
+    :return: a boolean, a string or a byte array indicating the result of the execution of the SC
+    :rtype: bool, string or bytearray
 
     """
+
+    arg_length_error = 'Incorrect number of arguments'
 
     # Uses the trigger to dertermine whether this smart contract is being run in 'verification' mode
     # or 'application' mode.
@@ -72,17 +74,21 @@ def Main(operation, args):
         elif operation == 'addURL':
             if len(args) == 1:
                 url = args[0]
-                r = add_url(url)
-                return r
-            else:
-                return False
+                result = add_url(url)
+                return result
+            return arg_length_error
         elif operation == 'getURL':
             if len(args) == 1:
                 code = args[0]
-                r = get_url(code)
-                return r
-            else:
-                return False
+                result = get_url(code)
+                return result
+            return arg_length_error
+        elif operation == 'getURLInfo':
+            if len(args) == 1:
+                code = args[0]
+                result = get_url_info(code)
+                return result
+            return arg_length_error
 
         result = 'unknown operation'
         return result
@@ -109,10 +115,12 @@ def add_url(url):
     code = concat(code_part1, s3)
     Notify(code)
 
-    # Puts it into the ledger.
+    # Puts the URL and the related information into the ledger.
     context = GetContext()
-    contextkey_for_url = concat(code, '__url')
-    contextkey_for_sender = concat(code, '__sender')
+    contextkey_for_url = get_contextkey_for_url(code)
+    contextkey_for_sender = get_contextkey_for_sender(code)
+    # NOTE: dictionaries are not yey supported by the neo-boa compiler so we have to derive multiple
+    # context keys from the code value for each item associated with the considered code.
     Put(context, contextkey_for_url, url)
     Put(context, contextkey_for_sender, sender)
 
@@ -125,9 +133,20 @@ def add_url(url):
 def get_url(code):
     """ Returns the URL associated with the considered code. """
     context = GetContext()
-    contextkey_for_url = concat(code, '__url')
+    contextkey_for_url = get_contextkey_for_url(code)
     url = Get(context, contextkey_for_url)
     return url
+
+
+def get_url_info(code):
+    """ Returns all the information available for the considered code. """
+    context = GetContext()
+    contextkey_for_url = get_contextkey_for_url(code)
+    contextkey_for_sender = get_contextkey_for_sender(code)
+    url = Get(context, contextkey_for_url)
+    sender = Get(context, contextkey_for_sender)
+    result = [url, sender]
+    return result
 
 
 # -------------------------------------------
@@ -155,3 +174,15 @@ def b58encode(i, max_length):
         current_length += 1
 
     return code
+
+
+def get_contextkey_for_url(code):
+    """ Returns the context key to use for retrieving an URL associated with a code. """
+    contextkey = concat(code, '__url')
+    return contextkey
+
+
+def get_contextkey_for_sender(code):
+    """ Returns the context key to use for retrieving a sender address associated with a code. """
+    contextkey = concat(code, '__sender')
+    return contextkey
