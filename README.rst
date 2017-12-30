@@ -11,7 +11,7 @@ always lead to where they are supposed to.
 
 This repository embeds the smart contract used by the Ledgerlink service. This smart contract
 provides a secure way of generating shortened-URLs and storing the related uniques codes into the
-NEO blockchain. This smart contract is written in Python and makes use of the neo-boa_ compiler.
+NEO blockchain. It is written in Python and makes use of the neo-boa_ compiler.
 
 .. contents:: Table of Contents
     :local:
