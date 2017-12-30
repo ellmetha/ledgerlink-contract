@@ -1,5 +1,4 @@
 """
-
     Ledgerlink smart contract
     =========================
 
@@ -92,8 +91,8 @@ def Main(operation, args):
 
 
 def add_url(url):
-    """ Generates  new code and stores the <code, url> pair into the blockchain. """
-    # Retrieves the current "height" of the blockchain.
+    """ Generates a new code and stores the <code, url> pair into the blockchain. """
+    # Retrieves the current "height" of the blockchain, as of the related block and timestamp.
     current_height = GetHeight()
 
     # Retrieves the hash of the considered sender.
@@ -113,9 +112,11 @@ def add_url(url):
     # Puts it into the ledger.
     context = GetContext()
     contextkey_for_url = concat(code, '__url')
+    contextkey_for_sender = concat(code, '__sender')
     Put(context, contextkey_for_url, url)
+    Put(context, contextkey_for_sender, sender)
 
-    # Fures an event indicating which <code, url> pair has been persisted into the ledger.
+    # Fires an event indicating which <code, url> pair has been persisted into the ledger.
     DispatchNewURLEvent(code, url)
 
     return True
