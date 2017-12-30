@@ -5,7 +5,7 @@ ledgerlink-contract
 
 Ledgerlink (or ledgr.link) is a URL shortener service that uses the NEO blockchain as a mean to
 store irreplaceable short URLs. Such shortened URLs are protected against any third party
-interference because they cannot be changed by anybody - they will live forever on the NEO
+interferences because they cannot be changed by anybody - they will live forever on the NEO
 blockchain. Thus the NEO blockchain is used as a source of trust, ensuring that the shortened links
 always lead to where they are supposed to.
 
@@ -18,8 +18,30 @@ Main requirements
 * Python_ 3.4 or 3.5.
 * Pipenv_ 3.5+
 
-Installation
-------------
+Development setup
+-----------------
+
+Quickstart
+~~~~~~~~~~
+
+You can install the project locally using the following commands:
+
+.. code-block:: shell
+
+  $ git clone https://github.com/ellmetha/ledgerlink-contract && cd ledgerlink-contract
+  $ pipenv install --dev --python /usr/bin/python3.5  # or any other valid path
+
+Once all the dependencies have been installed, you can trigger the compilation of the smart contract
+using the following command:
+
+.. code-block:: shell
+
+  $ make avm
+
+The resulting ``ledgerlink.avm`` file will be stored under the ``./build`` directory.
+
+Testing the contract using a privnet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 License
 -------
