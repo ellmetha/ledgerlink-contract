@@ -2,7 +2,7 @@
 
     <p align="center">
       <img
-        src="https://image.ibb.co/fX2qWb/2ylu_XG40_UH.png"
+        src="https://camo.githubusercontent.com/f28dd1e0c22bf995f4a815166eb35e09f61ee778/68747470733a2f2f696d6167652e6962622e636f2f6658327157622f32796c755f584734305f55482e706e67"
         width="125px;">
     </p>
 
