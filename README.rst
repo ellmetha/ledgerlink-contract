@@ -2,7 +2,7 @@
 
     <p align="center">
       <img
-        src="https://raw.githubusercontent.com/ellmetha/ledgerlink-contract/master/_files/ledgerlink_logo.svg"
+        src="https://image.ibb.co/fX2qWb/2ylu_XG40_UH.png"
         width="125px;">
     </p>
 
