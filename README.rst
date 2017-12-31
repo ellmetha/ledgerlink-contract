@@ -1,6 +1,18 @@
-ledgerlink-contract
-===================
+.. raw:: html
 
+    <p align="center">
+      <img
+        src="https://raw.githubusercontent.com/ellmetha/ledgerlink-contract/master/_files/ledgerlink_logo.svg"
+        width="125px;">
+    </p>
+
+    <h1 align="center">ledgerlink-contract</h1>
+
+    <p align="center">
+        Smart contract backing the ledgr.link URL shortener service.
+    </p>
+
+|
 |
 
 Ledgerlink (or ledgr.link) is a URL shortener service that uses the NEO blockchain as a mean to
@@ -17,16 +29,16 @@ NEO blockchain. It is written in Python and makes use of the neo-boa_ compiler.
     :local:
 
 Main requirements
------------------
+=================
 
 * Python_ 3.4 or 3.5.
 * Pipenv_ 3.5+
 
 Development setup
------------------
+=================
 
 Quickstart
-~~~~~~~~~~
+----------
 
 You can install the project locally using the following commands:
 
@@ -45,10 +57,10 @@ using the following command:
 The resulting ``ledgerlink.avm`` file will be stored under the ``./build`` directory.
 
 Testing the contract using a privnet
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 License
--------
+=======
 
 MIT. See ``LICENSE`` for more details.
 
