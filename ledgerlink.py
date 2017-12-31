@@ -12,7 +12,7 @@
 from boa.blockchain.vm.Neo.Action import RegisterAction
 from boa.blockchain.vm.Neo.Blockchain import GetHeight
 from boa.blockchain.vm.Neo.Output import GetScriptHash
-from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger, Notify
+from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger
 from boa.blockchain.vm.Neo.Storage import Get, GetContext, Put
 from boa.blockchain.vm.Neo.TriggerType import Application, Verification
 from boa.blockchain.vm.System.ExecutionEngine import GetScriptContainer
@@ -24,10 +24,13 @@ from boa.code.builtins import concat, substr
 # -------------------------------------------
 
 # Script hash of the contract owner.
-OWNER = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+OWNER = b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
 
 # The URL of the associated URL shortener service.
-SHORTENER_URL = 'https://ledgr.link'
+SHORTENER_URL = b'https://ledgr.link'
+
+# The key that will be used to store the shortener URL in the smart contract's storage.
+SHORTENER_URL_STORAGE_KEY = b'__shortenerurl__'
 
 
 # -------------------------------------------
@@ -68,13 +71,17 @@ def Main(operation, args):
             return True
         return False
     elif trigger == Application():
-        if operation == 'shortenerURL':
-            url = SHORTENER_URL
+        if operation == 'deploy':
+            result = deploy()
+            return result
+        if operation == 'getShortenerURL':
+            url = get_shortener_url()
             return url
         elif operation == 'addURL':
-            if len(args) == 1:
+            if len(args) == 2:
                 url = args[0]
-                result = add_url(url)
+                seed = args[1]
+                result = add_url(url, seed)
                 return result
             return arg_length_error
         elif operation == 'getURL':
@@ -96,8 +103,32 @@ def Main(operation, args):
     return False
 
 
-def add_url(url):
+def deploy():
+    """ Deploys the smart contract and initializes the shortener URL. """
+    # Checks whether the user that triggered the operation is the owner. If not we cannot allow the
+    # operation.
+    is_owner = CheckWitness(OWNER)
+    if not is_owner:
+        return False
+
+    context = GetContext()
+
+    is_contract_initialized = Get(context, '__initialized__')
+    if not is_contract_initialized:
+        # Runs deploy logic.
+        Put(context, '__initialized__', 1)
+        Put(context, SHORTENER_URL_STORAGE_KEY, SHORTENER_URL)
+        return True
+
+    return False
+
+
+def add_url(url, seed):
     """ Generates a new code and stores the <code, url> pair into the blockchain. """
+    # NOTE: we use a seed to improve the generation of the code assiated with the considered URL.
+    # This involves that an additional parameter is passed during the invocation (a "seed" number)
+    # in order to generate the final code.
+
     # Retrieves the current "height" of the blockchain, as of the related block and timestamp.
     current_height = GetHeight()
 
@@ -109,17 +140,14 @@ def add_url(url):
 
     # Generates a unique code.
     s1 = b58encode(current_height, 11)
-    s2 = b58encode(sender, 2)
-    s3 = b58encode(url, 2)
-    code_part1 = concat(s1, s2)
-    code = concat(code_part1, s3)
-    Notify(code)
+    s2 = b58encode(seed, 4)
+    code = concat(s1, s2)
 
     # Puts the URL and the related information into the ledger.
     context = GetContext()
     contextkey_for_url = get_contextkey_for_url(code)
     contextkey_for_sender = get_contextkey_for_sender(code)
-    # NOTE: dictionaries are not yey supported by the neo-boa compiler so we have to derive multiple
+    # NOTE: dictionaries are not yet supported by the neo-boa compiler so we have to derive multiple
     # context keys from the code value for each item associated with the considered code.
     Put(context, contextkey_for_url, url)
     Put(context, contextkey_for_sender, sender)
@@ -128,6 +156,13 @@ def add_url(url):
     DispatchNewURLEvent(code, url)
 
     return True
+
+
+def get_shortener_url():
+    """ Returns the URL of the URL-shortener service. """
+    context = GetContext()
+    url = Get(context, SHORTENER_URL_STORAGE_KEY)
+    return url
 
 
 def get_url(code):
@@ -156,8 +191,8 @@ def get_url_info(code):
 
 def b58encode(i, max_length):
     """ Encodes an integer using Base58. """
-    alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    code = '\x00'
+    alphabet = b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    code = b''
 
     current_length = 0
     while i and (current_length < max_length):
