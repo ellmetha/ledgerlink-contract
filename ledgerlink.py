@@ -27,7 +27,7 @@ from boa.code.builtins import concat, substr
 OWNER = b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
 
 # The URL of the associated URL shortener service.
-SHORTENER_URL = b'https://ledgr.link'
+INITIAL_SHORTENER_URL = b'https://ledgr.link'
 
 # The key that will be used to store the shortener URL in the smart contract's storage.
 SHORTENER_URL_STORAGE_KEY = b'__shortenerurl__'
@@ -74,9 +74,6 @@ def Main(operation, args):
         if operation == 'deploy':
             result = deploy()
             return result
-        if operation == 'getShortenerURL':
-            url = get_shortener_url()
-            return url
         elif operation == 'addURL':
             if len(args) == 2:
                 url = args[0]
@@ -84,6 +81,9 @@ def Main(operation, args):
                 result = add_url(url, seed)
                 return result
             return arg_length_error
+        elif operation == 'getShortenerURL':
+            url = get_shortener_url()
+            return url
         elif operation == 'getURL':
             if len(args) == 1:
                 code = args[0]
@@ -96,6 +96,12 @@ def Main(operation, args):
                 result = get_url_info(code)
                 return result
             return arg_length_error
+        elif operation == 'setShortenerURL':
+            if len(args) == 1:
+                url = args[0]
+                result = set_shortener_url(url)
+                return result
+            return arg_length_error
 
         result = 'unknown operation'
         return result
@@ -105,8 +111,8 @@ def Main(operation, args):
 
 def deploy():
     """ Deploys the smart contract and initializes the shortener URL. """
-    # Checks whether the user that triggered the operation is the owner. If not we cannot allow the
-    # operation.
+    # Checks that the user that triggered the operation is the owner. If not we cannot allow the
+    # operation because only the owner of the smart contract is able to run the deploy operation.
     is_owner = CheckWitness(OWNER)
     if not is_owner:
         return False
@@ -117,7 +123,7 @@ def deploy():
     if not is_contract_initialized:
         # Runs deploy logic.
         Put(context, '__initialized__', 1)
-        Put(context, SHORTENER_URL_STORAGE_KEY, SHORTENER_URL)
+        Put(context, SHORTENER_URL_STORAGE_KEY, INITIAL_SHORTENER_URL)
         return True
 
     return False
@@ -182,6 +188,21 @@ def get_url_info(code):
     sender = Get(context, contextkey_for_sender)
     result = [url, sender]
     return result
+
+
+def set_shortener_url(url):
+    """ Allows to update the URL associated with the URL-shortener service. """
+    # Checks that the user that triggered the operation is the owner. If not we cannot allow the
+    # operation because only the owner of the smart contract can change the URL of the URL-shortener
+    # service.
+    is_owner = CheckWitness(OWNER)
+    if not is_owner:
+        return False
+
+    context = GetContext()
+    Put(context, SHORTENER_URL_STORAGE_KEY, url)
+
+    return True
 
 
 # -------------------------------------------
