@@ -12,7 +12,7 @@
 from boa.blockchain.vm.Neo.Action import RegisterAction
 from boa.blockchain.vm.Neo.Blockchain import GetHeader, GetHeight
 from boa.blockchain.vm.Neo.Output import GetScriptHash
-from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger, Notify
+from boa.blockchain.vm.Neo.Runtime import CheckWitness, GetTrigger
 from boa.blockchain.vm.Neo.Storage import Get, GetContext, Put
 from boa.blockchain.vm.Neo.TriggerType import Application, Verification
 from boa.blockchain.vm.System.ExecutionEngine import GetScriptContainer
