@@ -59,12 +59,78 @@ The resulting ``ledgerlink.avm`` file will be stored under the ``./build`` direc
 Testing the contract using a privnet
 ------------------------------------
 
+You'll need a working Docker_ installation in order to set up such privnet. The first thing to do
+is to pull a Docker image containing a working NEO privnet and a wallet associated with a convenient
+amount of GAS.
+
+.. code-block:: shell
+
+  $ docker pull metachris/neo-privnet-with-gas
+  $ curl https://s3.amazonaws.com/neo-experiments/neo-privnet.wallet -o /tmp/neo-privnet.wallet
+
+You can now start up the privnet using the following command:
+
+.. code-block:: shell
+
+  $ docker run -d --name neo-privnet-with-gas -p 20333-20336:20333-20336/tcp -p 30333-30336:30333-30336/tcp metachris/neo-privnet-with-gas
+
+You now pull the latest version of neo-python_ and start the node with PrivNet configuration using:
+
+.. code-block:: shell
+
+  $ git clone https://github.com/CityOfZion/neo-python
+  $ python prompt.py -p
+
+At this point it should possible to open the pre-configured wallet, deploy the compiled version of
+the smart contract and start interacting with it:
+
+.. code-block:: shell
+
+  # Open the wallet ; password is: coz
+  neo> open wallet /tmp/neo-privnet.wallet
+  [password]> ***
+  Opened wallet at /tmp/neo-privnet.wallet
+
+  # Rebuild wallet and associated assets.
+  neo> wallet rebuild
+
+  # Deploy the compiled AVM version of the ledgerlink contract.
+  neo> import contract /path/to/ledgerlink-contract/build/ledgerlink.avm 0710 01 True False
+  contract properties: 1
+  Please fill out the following contract details:
+  [Contract Name] > ledgerlink
+  [Contract Version] > 1
+  [Contract Author] >
+  [Contract Email] >
+  [Contract Description] >
+  Creating smart contract....
+                   Name: ledgerlink
+                Version: 1
+                 Author:
+                  Email:
+            Description:
+          Needs Storage: True
+   Needs Dynamic Invoke: False
+
+  # Wait for the contract to be persisted to the blockchain... and retrieve the hash script of the
+  # contract using the search command.
+  neo> contract search ledgerlink
+
+  # Invoke the smart contract in order to add a new URL
+  neo> testinvoke <scriptHash> addURL ['https://neo.org'] --attach-gas=0.001
+
+  # Wait for the transaction to be confirmed and copy the generated code from the logs.
+  # It should now be possible to retrieve the URL using the code with the following invocation.
+  neo> testinvoke <scriptHash> getURL ['<code>'] --attach-gas=0.001
+
 License
 =======
 
 MIT. See ``LICENSE`` for more details.
 
 
+.. _Docker: https://www.docker.com/
 .. _neo-boa: https://github.com/CityOfZion/neo-boa
+.. _neo-python: https://github.com/CityOfZion/neo-python
 .. _Pipenv: https://github.com/kennethreitz/pipenv
 .. _Python: https://www.python.org
