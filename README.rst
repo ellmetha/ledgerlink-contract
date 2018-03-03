@@ -2,26 +2,26 @@
 
     <p align="center">
       <img
-        src="https://camo.githubusercontent.com/f28dd1e0c22bf995f4a815166eb35e09f61ee778/68747470733a2f2f696d6167652e6962622e636f2f6658327157622f32796c755f584734305f55482e706e67"
+        src="https://raw.githubusercontent.com/ellmetha/ledgerlink-contract/master/_files/ledgerlink_logo.svg"
         width="125px;">
     </p>
 
     <h1 align="center">ledgerlink-contract</h1>
 
     <p align="center">
-        Smart contract backing the ledgr.link URL shortener service.
+        Smart contract backing a hypothetical ledgr.link URL shortener service.
     </p>
 
 |
 |
 
-Ledgerlink (or ledgr.link) is a URL shortener service that uses the NEO blockchain as a mean to
-store irreplaceable / unfalsifiable short URLs. Such shortened URLs are protected against any third
-party interferences because they cannot be changed by anybody - they will live forever on the NEO
-blockchain. Thus the NEO blockchain is used as a source of trust, ensuring that the shortened links
-always lead to where they are supposed to.
+Ledgerlink (or ledgr.link) is a hypothetical URL shortener service that uses the NEO blockchain as a
+mean to store irreplaceable / unfalsifiable short URLs. Such shortened URLs are protected against
+any third party interferences because they cannot be changed by anybody - they will live forever on
+the NEO blockchain. Thus the NEO blockchain is used as a source of trust, ensuring that the
+shortened links always lead to where they are supposed to.
 
-This repository embeds the smart contract used by the Ledgerlink service. This smart contract
+This repository embeds the smart contract used by this URL shortener service. This smart contract
 provides a secure way of generating shortened-URLs and storing the related uniques codes into the
 NEO blockchain. It is written in Python and makes use of the neo-boa_ compiler.
 
